@@ -13,7 +13,6 @@ import android.view.View;
 import java.util.Arrays;
 
 public class VisualizerView extends View {
-    private byte[] waveformDaten;
     private byte[] fftDaten;
     int samplingRate;
     private float[] punkteZumZeichnen;
@@ -49,7 +48,6 @@ public class VisualizerView extends View {
     }
 
     private void init() {
-        waveformDaten = null;
         fftDaten = null;
 
         paint.setStrokeWidth(3f);
@@ -57,11 +55,7 @@ public class VisualizerView extends View {
         paint.setColor(Color.WHITE);
     }
 
-    public void updateVisualizerWaveform(byte[] waveformDaten) {
 
-        this.waveformDaten = waveformDaten;
-        invalidate(); //Zeichnet die View neu
-    }
 
     public void updateVisualizerFFT(byte[] fftDaten, int samplingRate) {
         this.samplingRate = samplingRate / 1000;
@@ -73,34 +67,6 @@ public class VisualizerView extends View {
     protected void onDraw(Canvas canvas) { //Wird automatisch aufgerufen, wenn die View neu gezeichnet werden soll
         super.onDraw(canvas);
 
-        if (waveformDaten == null && fftDaten == null) {
-
-            return;
-        }
-
-        if (waveformDaten != null) {
-
-            //Ist das punkteZumZeichnen-Array groß genug für die übergebenen waveform-Daten?
-            //Jedes benachbarte Paar aus den waveform-Daten bedingt 2 Punkte mit je 2 Koordinaten
-            if (punkteZumZeichnen == null || punkteZumZeichnen.length < waveformDaten.length * 4) {
-                punkteZumZeichnen = new float[waveformDaten.length * 4];
-            }
-
-            viewRect.set(0, 0, getWidth(), getHeight());
-
-            for (int i = 0, j = 0; i < waveformDaten.length - 1; i++, j += 4) {
-                float left = viewRect.width() * i / (float) (waveformDaten.length - 1);
-                float top = viewRect.height() - ((byte) (waveformDaten[i] + 128)) * viewRect.height() / 128f;
-                float right = viewRect.width() * (i + 1) / (float) (waveformDaten.length - 1);
-                float bottom = viewRect.height() - ((byte) (waveformDaten[i + 1] + 128)) * viewRect.height() / 128f;
-
-                punkteZumZeichnen[j] = left;
-                punkteZumZeichnen[j + 1] = top;
-                punkteZumZeichnen[j + 2] = right;
-                punkteZumZeichnen[j + 3] = bottom;
-            }
-            canvas.drawLines(punkteZumZeichnen, paint);
-        }
 
         if (fftDaten != null) {
             updateRateAusgeben();
@@ -115,7 +81,7 @@ public class VisualizerView extends View {
             for (int i = 0; i < fftDaten.length / 2; i++) { //iteriere durchs fft-Array
                 int re = i * 2;
                 int im = i * 2 + 1;
-                int frequenzAmIndex = (i + 1) * samplingRate / 2 / fftDaten.length;
+                int frequenzAmIndex = (int) ((i + 1) * samplingRate / 2 / fftDaten.length);
 
                 float amplitude = (float) Math.hypot(fftDaten[re], fftDaten[im]);
                 int amplitudeNormalisiert = Math.min(viewRect.height(), (int) (amplitude * viewRect.height() / 255f));

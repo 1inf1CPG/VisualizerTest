@@ -115,7 +115,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onWaveFormDataCapture(Visualizer visualizer, byte[] waveformDaten, int samplingRate) { //wird aufgerufen, wenn neue Wellenform-Daten verfügbar sind.
                 //Waveform: Amplitude der Audiosignale im Zeitbereich
-                //visualizerView.updateVisualizerWaveform(waveformDaten);
             }
 
             @Override
@@ -123,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
                 //Fast Fourier Transform: Frequenzkomponenten des Audiosignals im Frequenzbereich
                 visualizerView.updateVisualizerFFT(fftDaten, samplingRate);
             }
-        }, Visualizer.getMaxCaptureRate(), true, true); //Abtastrate in Hz
+        }, Visualizer.getMaxCaptureRate(), false, true); //Abtastrate in Hz
 
         visualizer.setEnabled(false);
         visualizerViewContainer.addView(visualizerView);
